@@ -128,7 +128,7 @@ class order_CartService extends BaseService
 	 * @param order_CartInfo $cart
 	 */
 	public function resetCartOrder($cart)
-	{	
+	{
 		if (Framework::isInfoEnabled())
 		{
 			Framework::info(__METHOD__);
@@ -206,6 +206,9 @@ class order_CartService extends BaseService
 			return false;
 		}
 		
+		$product->getDocumentService()->getProductToAddToCart($product, $cart->getShop(), $quantity, $properties);
+		$key = $product->getCartLineKey();
+		
 		try 
 		{
 			 $this->validateCartLineCount($cart);
@@ -217,12 +220,10 @@ class order_CartService extends BaseService
 			return false;
 		}
 		
-		$product = $product->getDocumentService()->getProductToAddToCart($product, $cart->getShop(), $quantity, $properties);
 		$product->getDocumentService()->updateProductFromCartProperties($product, $properties);
 		
 		if ($this->validateProduct($cart, $product, $quantity))
 		{
-			$key = $product->getCartLineKey();
 			Framework::info(__METHOD__ . ' Check Key:' . $key);
 			$cartLine = $this->getCartLineByKey($cart, $key);
 			if ($cartLine === null)
