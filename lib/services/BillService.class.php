@@ -356,12 +356,15 @@ class order_BillService extends f_persistentdocument_DocumentService
 		 if ($bill->getPublicationstatus() == 'FILED')
                 {
 			$bill->setPublicationstatus('DRAFT');
+			// this save must be done before $this->getNextBillNumber(), because the default numbering strategy counts 'FILED' bills. 
                         $this->save($bill);
                 }
 
 
 		$order = $bill->getOrder();	
 		$bill->setLabel($this->getNextBillNumber());	
+		// this save must be done, othervise $this->activate() persists the modifications without modifying the modificationdate property
+		$this->save($bill);
 		$this->activate($bill->getId());
 		if ($bill->getStatus() == self::SUCCESS)
 		{
